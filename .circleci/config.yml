@@ -30,7 +30,7 @@ jobs:
       - checkout
     # - your-orb/your-orb-command
       - newrelic/record_deployment:
-        - app-name: "Drava Server PROD-CA"
+          app-name: "Drava Server PROD-CA"
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
