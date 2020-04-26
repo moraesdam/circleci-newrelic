@@ -28,9 +28,7 @@ jobs:
     executor: orb-tools/ubuntu
     steps:
       - checkout
-    # - your-orb/your-orb-command
-      - newrelic/record_deployment:
-          app-name: "Drava Server PROD-CA"
+      - newrelic/record_deployment
 
 workflows:
   # This `lint-pack_validate_publish-dev` workflow will run on any commit.
