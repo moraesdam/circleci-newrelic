@@ -50,7 +50,7 @@ record_deployment:
           COMPARE_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMPARE_LINK")"
 
           DESCRIPTION="Commit: ${COMMIT_LINK}\\nCompare: ${COMPARE_LINK}"
-          echo 'export DESCRIPTION="'"$DESCRIPTION"'"' >> $BASH_ENV      
+          echo 'export DESCRIPTION="'"$DESCRIPTION"'"' >> $BASH_ENV
 
     - run:
         name: Record deployment
