@@ -6,6 +6,7 @@ usage:
     newrelic: dmoraes/newrelic@volatile
   jobs:
     build:
+      machine: true
       steps:
         - checkout
         - newrelic/record_deployment:
