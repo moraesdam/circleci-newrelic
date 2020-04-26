@@ -15,7 +15,7 @@ parameters:
   changelog:
     type: string
     description: Optional changelog
-    default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
+    default: $(git log --format=%B -n 1 $CIRCLE_SHA1)
 
 steps:
   - run:
@@ -42,7 +42,7 @@ steps:
   - run:
       name: Shortify GitHub urls
       command: |
-        COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_SHA1}"
+        COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
         COMPARE_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/compare/${CIRCLE_SHA1}%5E..${CIRCLE_SHA1}"
 
         COMMIT_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMMIT_LINK")"
