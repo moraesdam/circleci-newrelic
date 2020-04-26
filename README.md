@@ -7,14 +7,6 @@ This orb was based on these other:
 * [finetune/newrelic](https://circleci.com/orbs/registry/orb/finetune/newrelic)
 * [aarani/newrelic](https://circleci.com/orbs/registry/orb/aanari/newrelic)
 
-**TODO:**
-Publish your production orb! You may notice the badges above and links to the registry page below are not working yet, once you publish your first production version orb, these will begin to function.
-
-What to do:
-* Make changes to your `Alpha` branch.
-* Flush out your integration test jobs
-* Merge to `master` with "`[semver:major]`" in the commit subject to publish 1.0.0 of your orb.
-
 
 ## Usage
 
