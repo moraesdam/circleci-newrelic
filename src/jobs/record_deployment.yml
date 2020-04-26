@@ -1,0 +1,20 @@
+jobs:
+  record_deployment:
+    executor: default
+    parameters:
+      app-id:
+        type: string
+        default: $NEW_RELIC_APP_ID
+      app-name:
+        type: string
+        default: $NEW_RELIC_APP_NAME
+      api-key:
+        type: string
+        default: $NEW_RELIC_API_KEY
+    steps:
+      - checkout
+      - record_deployment:
+          app-id: << parameters.app-id >>
+          app-name: << parameters.app-name >>
+          api-key: << parameters.api-key >>
+          changelog: << parameters.changelog >>

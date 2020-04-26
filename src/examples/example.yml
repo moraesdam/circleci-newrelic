@@ -5,10 +5,12 @@ description: >
 usage:
   version: 2.1
   orbs:
-    foo: bar/foo@1.2.3
+    newrelic: dmoraes/newrelic@volatile
   jobs:
     build:
       machine: true
       steps:
-        - foo/hello:
-            username: "Anna"
+        - newrelic/hello:
+            username: "Daniel"
+        - newrelic/record_deployment:
+            app-id: "123456"
