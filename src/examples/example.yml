@@ -6,7 +6,8 @@ usage:
     newrelic: dmoraes/newrelic@volatile
   jobs:
     build:
-      machine: true
+      docker:
+      - image: any-image-you-want:latest
       steps:
         - checkout
         - newrelic/record_deployment:
