@@ -20,7 +20,6 @@ parameters:
     default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
 
 steps:
-  - checkout
   - record_deployment:
       app-id: << parameters.app-id >>
       app-name: << parameters.app-name >>
