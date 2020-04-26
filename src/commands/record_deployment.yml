@@ -19,7 +19,7 @@ parameters:
 
 steps:
   - run:
-      name: Check application ID 
+      name: Check application ID
       command: |
         if test -z "<< parameters.app-id >>" -a -n "<< parameters.app-name >>" ; then
           echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
