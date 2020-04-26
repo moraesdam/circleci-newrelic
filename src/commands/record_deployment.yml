@@ -19,7 +19,7 @@ parameters:
 
 steps:
   - run:
-      name: Get complementary application ID if needed
+      name: Check application ID 
       command: |
         if test -z "<< parameters.app-id >>" -a -n "<< parameters.app-name >>" ; then
           echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
@@ -29,7 +29,7 @@ steps:
         elif test -z "<< parameters.app-name >>" -a -n "<< parameters.app-id >>" ; then
           echo "'app-name' not provided. Trying to figure it out from 'app-id'..."
           APP_ID="<< parameters.app-id >>"
-          APP_NAME=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.id == \"${APP_ID}\") | .name")
+          APP_NAME=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.id == "${APP_ID}") | .name")
           echo "Found app-name: '${APP_NAME}' for app-id: '${APP_ID}'"
         elif test -z "<< parameters.app-name >>" -a -z "<< parameters.app-id >>" ; then
           echo "Oops, either app-id or app-name was not provided. We can't go any further without one of these."
@@ -54,7 +54,7 @@ steps:
   - run:
       name: Record deployment
       command: |
-        echo "Recording deployment on New Relic for: APP_ID: ${APP_ID} / APP_NAME: ${APP_NAME}"
+        echo "Recording deployment on New Relic for: APP_ID: $APP_ID / APP_NAME: $APP_NAME"
         if [ -n "$APP_ID" ]; then
           response=$(curl -s -w "\n%{http_code}" -X POST "https://api.newrelic.com/v2/applications/${APP_ID}/deployments.json" \
               -H "X-Api-Key: ${NEW_RELIC_API_KEY}" -i \
