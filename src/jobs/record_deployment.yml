@@ -1,20 +1,28 @@
-jobs:
-  record_deployment:
-    executor: default
-    parameters:
-      app-id:
-        type: string
-        default: $NEW_RELIC_APP_ID
-      app-name:
-        type: string
-        default: $NEW_RELIC_APP_NAME
-      api-key:
-        type: string
-        default: $NEW_RELIC_API_KEY
-    steps:
-      - checkout
-      - record_deployment:
-          app-id: << parameters.app-id >>
-          app-name: << parameters.app-name >>
-          api-key: << parameters.api-key >>
-          changelog: << parameters.changelog >>
+description: >
+  "Records a deployment to New Relic"
+executor: default
+parameters:
+  app-id:
+    type: string
+    description: New Relic App ID (Optional if app-name is provided)
+    default: $NEW_RELIC_APP_ID
+  app-name:
+    type: string
+    description: New Relic App Name (Optional if app-id is provided)
+    default: $NEW_RELIC_APP_NAME
+  api-key:
+    type: string
+    description: New Relic REST API Key
+    default: $NEW_RELIC_API_KEY
+  changelog:
+    type: string
+    description: Optional changelog
+    default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
+
+steps:
+  - checkout
+  - record_deployment:
+      app-id: << parameters.app-id >>
+      app-name: << parameters.app-name >>
+      api-key: << parameters.api-key >>
+      changelog: << parameters.changelog >>

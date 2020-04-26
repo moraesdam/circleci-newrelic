@@ -1,83 +1,82 @@
-record_deployment:
-  description: "Records a deployment to New Relic"
-  parameters:
-    app-id:
-      type: string
-      description: New Relic App ID (Optional if app-name is provided)
-      default: $NEW_RELIC_APP_ID
-    app-name:
-      type: string
-      description: New Relic App Name (Optional if app-id is provided)
-      default: $NEW_RELIC_APP_NAME
-    api-key:
-      type: string
-      description: New Relic REST API Key
-      default: $NEW_RELIC_API_KEY
-    changelog:
-      type: string
-      description: Optional changelog
-      default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
+description: "Records a deployment to New Relic"
+parameters:
+  app-id:
+    type: string
+    description: New Relic App ID (Optional if app-name is provided)
+    default: $NEW_RELIC_APP_ID
+  app-name:
+    type: string
+    description: New Relic App Name (Optional if app-id is provided)
+    default: $NEW_RELIC_APP_NAME
+  api-key:
+    type: string
+    description: New Relic REST API Key
+    default: $NEW_RELIC_API_KEY
+  changelog:
+    type: string
+    description: Optional changelog
+    default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
 
-  steps:
-    - run:
-        name: Get complementary application ID if needed
-        command: |
-          if test -z "<< parameters.app-id >>" -a -n "<< parameters.app-name >>" ; then
-            echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
-            APP_NAME="<< parameters.app-name >>"
-            APP_ID=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.name == \"${APP_NAME}\") | .id")
-            echo "Found app-id: '${APP_ID}' for app-name: '${APP_NAME}'"
-          elif if test -z "<< parameters.app-name >>" -a -n "<< parameters.app-id >>" ; then
-            echo "'app-name' not provided. Trying to figure it out from 'app-id'..."
-            APP_ID="<< parameters.app-id >>"
-            APP_NAME=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.id == \"${APP_ID}\") | .name")
-            echo "Found app-name: '${APP_NAME}' for app-id: '${APP_ID}'"
-          elif if test -z "<< parameters.app-name >>" -a -z "<< parameters.app-id >>" ; then
-            echo "Oops, either app-id or app-name was not provided. We can't go any further without one of these."
-            exit 1
+steps:
+  - run:
+      name: Get complementary application ID if needed
+      command: |
+        if test -z "<< parameters.app-id >>" -a -n "<< parameters.app-name >>" ; then
+          echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
+          APP_NAME="<< parameters.app-name >>"
+          APP_ID=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.name == \"${APP_NAME}\") | .id")
+          echo "Found app-id: '${APP_ID}' for app-name: '${APP_NAME}'"
+        elif if test -z "<< parameters.app-name >>" -a -n "<< parameters.app-id >>" ; then
+          echo "'app-name' not provided. Trying to figure it out from 'app-id'..."
+          APP_ID="<< parameters.app-id >>"
+          APP_NAME=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:${NEW_RELIC_API_KEY}" |  jq -r ".applications[] | select(.id == \"${APP_ID}\") | .name")
+          echo "Found app-name: '${APP_NAME}' for app-id: '${APP_ID}'"
+        elif if test -z "<< parameters.app-name >>" -a -z "<< parameters.app-id >>" ; then
+          echo "Oops, either app-id or app-name was not provided. We can't go any further without one of these."
+          exit 1
+        fi
+
+        echo 'export APP_NAME="'"$APP_NAME"'"' >> $BASH_ENV
+        echo 'export APP_ID="'"$APP_ID"'"' >> $BASH_ENV
+
+  - run:
+      name: Shortify GitHub urls
+      command: |
+        COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_SHA1}"
+        COMPARE_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/compare/${CIRCLE_SHA1}%5E..${CIRCLE_SHA1}"
+
+        COMMIT_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMMIT_LINK")"
+        COMPARE_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMPARE_LINK")"
+
+        DESCRIPTION="Commit: ${COMMIT_LINK}\\nCompare: ${COMPARE_LINK}"
+        echo 'export DESCRIPTION="'"$DESCRIPTION"'"' >> $BASH_ENV
+
+  - run:
+      name: Record deployment
+      command: |
+        echo "Recording deployment on New Relic for: APP_ID: ${APP_ID} / APP_NAME: ${APP_NAME}"
+        if [ -n "$APP_ID" ]; then
+          response=$(curl -s -w "\n%{http_code}" -X POST "https://api.newrelic.com/v2/applications/${APP_ID}/deployments.json" \
+              -H "X-Api-Key: ${NEW_RELIC_API_KEY}" -i \
+              -H "Content-Type: application/json" \
+              -d \
+          '{
+            "deployment": {
+              "revision": "'"${CIRCLE_SHA1:0:7}"'",
+              "changelog": "'"<< parameters.changelog >>"'",
+              "description": "'"${DESCRIPTION}"'",
+              "user": "'"${CIRCLE_USERNAME}"'"
+            }
+          }')
+
+          response=(${response[@]}) # convert to array
+          code=${response[-1]} # get last element (last line)
+          body=${response[@]::${#response[@]}-1} # get all elements except last
+
+          echo "$body"
+          if [ $code -gt 201 ]; then
+            exit $code
           fi
-
-          echo 'export APP_NAME="'"$APP_NAME"'"' >> $BASH_ENV
-          echo 'export APP_ID="'"$APP_ID"'"' >> $BASH_ENV
-
-    - run:
-        name: Shortify GitHub urls
-        command: |
-          COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_SHA1}"
-          COMPARE_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/compare/${CIRCLE_SHA1}%5E..${CIRCLE_SHA1}"
-
-          COMMIT_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMMIT_LINK")"
-          COMPARE_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMPARE_LINK")"
-
-          DESCRIPTION="Commit: ${COMMIT_LINK}\\nCompare: ${COMPARE_LINK}"
-          echo 'export DESCRIPTION="'"$DESCRIPTION"'"' >> $BASH_ENV
-
-    - run:
-        name: Record deployment
-        command: |
-          echo "Recording deployment on New Relic for: APP_ID: ${APP_ID} / APP_NAME: ${APP_NAME}"
-          if [ -n "$APP_ID" ]; then
-            response=$(curl -s -w "\n%{http_code}" -X POST "https://api.newrelic.com/v2/applications/${APP_ID}/deployments.json" \
-                -H "X-Api-Key: ${NEW_RELIC_API_KEY}" -i \
-                -H "Content-Type: application/json" \
-                -d \
-            '{
-              "deployment": {
-                "revision": "'"${CIRCLE_SHA1:0:7}"'",
-                "changelog": "'"<< parameters.changelog >>"'",
-                "description": "'"${DESCRIPTION}"'",
-                "user": "'"${CIRCLE_USERNAME}"'"
-              }
-            }')
-
-            response=(${response[@]}) # convert to array
-            code=${response[-1]} # get last element (last line)
-            body=${response[@]::${#response[@]}-1} # get all elements except last
-
-            echo "$body"
-            if [ $code -gt 201 ]; then
-              exit $code
-            fi
-          else
-            echo "No APP_ID has been found"
-          fi
+        else
+          echo "No APP_ID has been found"
+        fi
