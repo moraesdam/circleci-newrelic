@@ -1,19 +1,11 @@
 # newrelic CircleCI Orb [![CircleCI Build Status](https://circleci.com/gh/moraesdam/circleci-newrelic.svg?style=shield "CircleCI Build Status")](https://circleci.com/gh/moraesdam/circleci-newrelic) [![CircleCI Orb Version](https://img.shields.io/badge/endpoint.svg?url=https://badges.circleci.io/orb/moraesdam/newrelic)](https://circleci.com/orbs/registry/orb/moraesdam/newrelic) [![GitHub License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](https://raw.githubusercontent.com/moraesdam/circleci-newrelic/master/LICENSE) [![CircleCI Community](https://img.shields.io/badge/community-CircleCI%20Discuss-343434.svg)](https://discuss.circleci.com/c/ecosystem/orbs)
 
-Use this orb to record deployments on New Relic from your CircleCI workflow.
-You can use either the New Relic Application name or ID to do it.
+Record deployments on New Relic from your CircleCI workflow.
+Use either the New Relic Application name or ID to do it.
 
 This orb was based on these other:
 * [finetune/newrelic](https://circleci.com/orbs/registry/orb/finetune/newrelic)
 * [aarani/newrelic](https://circleci.com/orbs/registry/orb/aanari/newrelic)
-
-**TODO:**
-Publish your production orb! You may notice the badges above and links to the registry page below are not working yet, once you publish your first production version orb, these will begin to function.
-
-What to do:
-* Make changes to your `Alpha` branch.
-* Flush out your integration test jobs
-* Merge to `master` with "`[semver:major]`" in the commit subject to publish 1.0.0 of your orb.
 
 
 ## Usage
