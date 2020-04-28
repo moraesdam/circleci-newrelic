@@ -55,6 +55,8 @@ steps:
   - run:
       name: Record deployment
       command: |
+        echo "[DEBUG] BASH_ENV: $BASH_ENV"
+        set -x
         echo "Recording deployment on New Relic for: APP_ID: $APP_ID / APP_NAME: $APP_NAME"
         if [ -n "$APP_ID" ]; then
           response=$(curl -s -w "\n%{http_code}" -X POST "https://api.newrelic.com/v2/applications/${APP_ID}/deployments.json" \
