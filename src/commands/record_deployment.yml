@@ -25,7 +25,7 @@ steps:
           echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
           APP_NAME="<< parameters.app-name >>"
           APP_ID=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:$NEW_RELIC_API_KEY" |  jq -r ".applications[] | select(.name == \"$APP_NAME\") | .id")
-          if [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'." && exit 1;
+          [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'." && exit 1;
           echo "Found app-id: '$APP_ID' for app-name: '$APP_NAME'"
         elif test -z "<< parameters.app-name >>" -a -n "<< parameters.app-id >>" ; then
           echo "'app-name' not provided. Trying to figure it out from 'app-id'..."
