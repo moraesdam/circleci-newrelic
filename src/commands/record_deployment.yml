@@ -25,7 +25,7 @@ steps:
           NEW_RELIC_API_KEY="<< parameters.api-key >>"
         fi
 
-        if [ -z "$NEW_RELIC_API_KEY" ]; then 
+        if [ -z "$NEW_RELIC_API_KEY" ]; then
           "Oops, either api-key or NEW_RELIC_API_KEY was not provided. We can't go any further without one of these."
           exit 1
         fi
