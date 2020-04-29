@@ -7,9 +7,9 @@ usage:
   jobs:
     build:
       docker:
-        - image: any-image-you-want:latest
+      - image: any-image-you-want:latest
       steps:
-        - checkout
-        - newrelic/record_deployment:
+      - checkout
+      - newrelic/record_deployment:
           api-key: "$NEW_RELIC_API_KEY"
           app-id: "$NEW_RELIC_APP_ID"
