@@ -1,9 +1,11 @@
 #!/bin/sh
+# add this to your git pre-commit hook doing: ln -s ln -s ../../pre-commit .git/hooks/ 
+# and don't forget to install its dependencies: yamllint and circleci cli tools
 
 set -o pipefail
 
-# Chech yaml syntax
+echo "[pre-commit hook] Cheking yaml syntax..."
 yamllint . || exit 1
 
-# Validate orb
+echo "[pre-commit hook] Validating orb..."
 circleci config pack src | circleci orb --skip-update-check validate - || exit 1
