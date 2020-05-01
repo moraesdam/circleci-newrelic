@@ -19,8 +19,9 @@ parameters:
 
 steps:
   - run:
-      name: Check application ID
+      name: Record deployment on New Relic
       command: |
+        # Checking Application ID
         if [ -n "<< parameters.api-key >>" ]; then
           NEW_RELIC_API_KEY="<< parameters.api-key >>"
         fi
@@ -49,25 +50,15 @@ steps:
           exit 1
         fi
 
-        echo 'export NEW_RELIC_API_KEY="'"$NEW_RELIC_API_KEY"'"' >> $BASH_ENV
-        echo 'export APP_NAME="'"$APP_NAME"'"' >> $BASH_ENV
-        echo 'export APP_ID="'"$APP_ID"'"' >> $BASH_ENV
-
-  - run:
-      name: Shortify GitHub urls
-      command: |
+        # Shortify GitHub urls
         COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
         COMPARE_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/compare/${CIRCLE_SHA1}%5E..${CIRCLE_SHA1}"
-
         COMMIT_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMMIT_LINK")"
         COMPARE_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMPARE_LINK")"
 
         DESCRIPTION="Commit: ${COMMIT_LINK}\\nCompare: ${COMPARE_LINK}"
-        echo 'export DESCRIPTION="'"$DESCRIPTION"'"' >> $BASH_ENV
 
-  - run:
-      name: Record deployment
-      command: |
+        # Record deployment
         echo "Recording deployment on New Relic for: APP_ID: $APP_ID / APP_NAME: $APP_NAME"
         if [ -n "$APP_ID" ]; then
           response=$(curl -s -w "\n%{http_code}" -X POST "https://api.newrelic.com/v2/applications/${APP_ID}/deployments.json" \
