@@ -27,25 +27,25 @@ steps:
         fi
 
         if [ -z "$NEW_RELIC_API_KEY" ]; then
-          echo "Oops, either api-key or NEW_RELIC_API_KEY was not provided. We can't go any further without one of these."
-          exit 1
+          echo "Oops, either api-key or NEW_RELIC_API_KEY was not provided. We can't go any further without one of these. Skipping..."
+          exit 0
         fi
 
         if test -z "<< parameters.app-id >>" -a -n "<< parameters.app-name >>" ; then
           echo "'app-id' not provided. Trying to figure it out from 'app-name'..."
           APP_NAME="<< parameters.app-name >>"
           APP_ID=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:$NEW_RELIC_API_KEY" |  jq -r ".applications[] | select(.name == \"$APP_NAME\") | .id")
-          [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'." && exit 1;
+          [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'. Skipping..." && exit 0;
           echo "Found app-id: '$APP_ID' for app-name: '$APP_NAME'"
         elif test -z "<< parameters.app-name >>" -a -n "<< parameters.app-id >>" ; then
           echo "'app-name' not provided. Trying to figure it out from 'app-id'..."
           APP_ID="<< parameters.app-id >>"
           APP_NAME=$(curl -sX GET "https://api.newrelic.com/v2/applications.json" -H "X-Api-Key:$NEW_RELIC_API_KEY" |  jq -r ".applications[] | select(.id == "$APP_ID") | .name")
-          [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'." && exit 1;
+          [ -z "$APP_ID" ] && echo "Sorry, App ID not found for app '$APP_NAME'. Skipping..." && exit 0;
           echo "Found app-name: '$APP_NAME' for app-id: '$APP_ID'"
         elif test -z "<< parameters.app-name >>" -a -z "<< parameters.app-id >>" ; then
-          echo "Oops, either app-id or app-name was not provided. We can't go any further without one of these."
-          exit 1
+          echo "Oops, either app-id or app-name was not provided. We can't go any further without one of these. Skipping..."
+          exit 0
         fi
 
         # Shortify GitHub urls
