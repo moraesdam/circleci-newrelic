@@ -15,7 +15,7 @@ parameters:
   changelog:
     type: string
     description: Optional changelog
-    default: $(git log --format=%B -n 1 $CIRCLE_SHA1)
+    default: $(git log --format=oneline -n 1 $CIRCLE_SHA1 | sed 's/"//g')
 
 steps:
   - run:
