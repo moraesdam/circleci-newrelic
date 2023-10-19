@@ -28,3 +28,15 @@ To publish a new production version:
 * On merge, the release will be published to the orb registry automatically.
 
 For further questions/comments about this or other orbs, visit the Orb Category of [CircleCI Discuss](https://discuss.circleci.com/c/orbs).
+
+### Publishing
+
+As this orb is structured using [FYAML](https://github.com/CircleCI-Public/fyaml), follow these steps to get it published:
+1. Pack its source into a single yaml file: 
+```
+circleci config pack src > /tmp/orb.yaml
+```
+2. Publish it:
+```
+circleci orb publish /tmp/orb.yaml moraesdam/newrelic@X.Y.Z
+``` 
