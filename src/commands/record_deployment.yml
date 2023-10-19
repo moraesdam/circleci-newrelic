@@ -50,13 +50,9 @@ steps:
           exit 0
         fi
 
-        # Shortify GitHub urls
         COMMIT_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
-        COMPARE_LINK="https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/compare/${CIRCLE_SHA1}%5E..${CIRCLE_SHA1}"
-        COMMIT_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMMIT_LINK")"
-        COMPARE_LINK="https://git.io/$(curl 'https://git.io/create' --data "url=$COMPARE_LINK")"
 
-        DESCRIPTION="Commit: ${COMMIT_LINK}\\nCompare: ${COMPARE_LINK}"
+        DESCRIPTION="${COMMIT_LINK}"
 
         # Record deployment
         echo "Recording deployment on New Relic for: APP_ID: $APP_ID / APP_NAME: $APP_NAME"
